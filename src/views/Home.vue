@@ -1,18 +1,13 @@
 <template>
-  <div class="home">
+  <div class="home" >
    <Movies 
    v-for="movie in wholeResponse"
    :key="movie.id" :movie="movie"
-   :loading="loading" />
-   
-<template>
-  <div class="text-center">
-    <v-pagination
-      v-model="page"
-      :length="6"
-    ></v-pagination>
-  </div>
-</template>
+   :loading="loading"  />
+
+  
+  
+  
   </div>
 </template>
 
@@ -20,18 +15,19 @@
 // @ is an alias to /src
 import axios from 'axios'
 import Movies from '@/components/Movies.vue'
-import SearcMovie from '@/components/SearchMovie.vue'
+
 export default {
   name: 'Home',
   components: {
   Movies,
-  SearcMovie
+
   },
   data () {
     return {
       wholeResponse: [],
       totalPages: 0,
-      page: "",
+      page: '1',
+      movies: [],
       loading: true
     }
   },
@@ -59,13 +55,7 @@ export default {
       console.log(error)
     })
   },
-  methods: {
-    async getMovies(){
-      const movies = await axios.get(`https://api.themoviedb.org/3/discover/movie?pages=${this.page}api_key=55ae7e8ee068e60e2522e6c2e15994aa`)
-    this.totalPages = movies.data?.total_pages
-    console.log(movies.data)
-    }
-  }
+  
 }
 </script>
 <style scoped>
