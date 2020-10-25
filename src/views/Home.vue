@@ -4,6 +4,19 @@
    v-for="movie in wholeResponse"
    :key="movie.id" :movie="movie"
    :loading="loading"  />
+   
+  <div class="text-center">
+    <v-pagination
+    v-if="wholeResponse.length > 0"
+      v-model="page"
+      :length="500"
+      :total-visible="7"
+      @input="next"
+     
+
+    ></v-pagination>
+  </div>
+
 
   
   
@@ -26,7 +39,7 @@ export default {
     return {
       wholeResponse: [],
       totalPages: 0,
-      page: '1',
+      page: 1,
       movies: [],
       loading: true
     }
@@ -34,27 +47,40 @@ export default {
 
   watch: {
     async '$route.params' () {
+      console.log(this.$route.query)
       try {
         let query = this.$route.query.q
-        let data = await axios.get(`https://api.themoviedb.org/3/search/multi?api_key=55ae7e8ee068e60e2522e6c2e15994aa&language=en-US&page=1&include_adult=false&query=${query}`)
+        let data = await axios.get(`https://api.themoviedb.org/3/search/multi?api_key=55ae7e8ee068e60e2522e6c2e15994aa&language=en-US&page=${this.$route.query.q}&include_adult=false&query=${query}`)
          this.wholeResponse = data.data.results
+      } catch (err) {
+        
+      }
+    },
+     async '$route.query.page' () {
+      console.log(this.$route.query)
+      try {
+        let query = this.$route.query.q
+        let data = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=55ae7e8ee068e60e2522e6c2e15994aa&page=${this.$route.query.page}`)
+         this.wholeResponse = data.data.results
+          this.page = Number(data.page)
       } catch (err) {
         
       }
     }
   },
   
-  mounted () {
-  axios
-    .get('https://api.themoviedb.org/3/discover/movie?api_key=55ae7e8ee068e60e2522e6c2e15994aa')
-    .then(response => {
+ async mounted () { 
+ let response = await axios.get('https://api.themoviedb.org/3/discover/movie?api_key=55ae7e8ee068e60e2522e6c2e15994aa')
       this.wholeResponse = response.data.results
-      this.loading = false
-    })
-    .catch(error => {
-      console.log(error)
-    })
+      this.page = Number(response.page)
+      this.totalPages = Number(response.total_pages)
+      this.loading = false 
   },
+  methods: {
+  next(e){
+this.$router.push({ query: Object.assign({}, this.$route.query, { page: e }) });
+  }
+  }
   
 }
 </script>
